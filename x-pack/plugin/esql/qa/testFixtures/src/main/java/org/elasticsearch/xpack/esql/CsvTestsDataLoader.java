@@ -7,19 +7,11 @@
 package org.elasticsearch.xpack.esql;
 
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.logging.log4j.core.config.plugins.util.PluginManager;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.cluster.ClusterModule;
 import org.elasticsearch.common.CheckedBiFunction;
-import org.elasticsearch.common.logging.LogConfigurator;
 import org.elasticsearch.common.xcontent.LoggingDeprecationHandler;
 import org.elasticsearch.common.xcontent.XContentHelper;
 import org.elasticsearch.logging.LogManager;
@@ -30,12 +22,12 @@ import org.elasticsearch.xcontent.XContent;
 import org.elasticsearch.xcontent.XContentParser;
 import org.elasticsearch.xcontent.XContentParserConfiguration;
 import org.elasticsearch.xcontent.XContentType;
+import org.elasticsearch.xpack.esql.parser.EsqlParser;
 import org.elasticsearch.xpack.ql.TestUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -101,6 +93,12 @@ public class CsvTestsDataLoader {
      */
     public static void main(String[] args) throws IOException {
         // Need to setup the log configuration properly to avoid messages when creating a new RestClient
+        System.out.println("Test program started");
+        EsqlParser parser = new EsqlParser();
+        parser.createStatement("from index-path | where a like \"c:\\*\"");
+        System.out.println("Test program finished");
+
+        /*
         PluginManager.addPackage(LogConfigurator.class.getPackage().getName());
         LogConfigurator.configureESLogging();
 
@@ -139,6 +137,7 @@ public class CsvTestsDataLoader {
         try (RestClient client = builder.build()) {
             loadDataSetIntoEs(client);
         }
+         */
     }
 
     public static void loadDataSetIntoEs(RestClient client) throws IOException {

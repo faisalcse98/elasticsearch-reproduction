@@ -6,6 +6,8 @@
  */
 package org.elasticsearch.xpack.esql.parser;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import org.elasticsearch.xpack.esql.EsqlClientException;
 import org.elasticsearch.xpack.ql.tree.Source;
 
@@ -19,6 +21,9 @@ public class ParsingException extends EsqlClientException {
         super(message, cause);
         this.line = line;
         this.charPositionInLine = charPositionInLine;
+        StringWriter sw = new StringWriter();
+        new Throwable("").printStackTrace(new PrintWriter(sw));
+        System.out.println(sw);
     }
 
     ParsingException(String message, Object... args) {
