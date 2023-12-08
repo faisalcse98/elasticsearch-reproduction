@@ -1,9 +1,12 @@
-apply plugin: 'elasticsearch.java'
+plugins {
+  id 'application'
+}
 
+apply plugin: 'elasticsearch.java'
 
 dependencies {
     implementation project(':x-pack:plugin:esql:compute')
-    compileOnly project(':x-pack:plugin:esql')
+    implementation project(':x-pack:plugin:esql')
     implementation project(":libs:elasticsearch-x-content")
     implementation project(':client:rest')
     implementation project(':libs:elasticsearch-logging')
@@ -30,3 +33,6 @@ task loadCsvSpecData(type: JavaExec) {
   mainClass = "org.elasticsearch.xpack.esql.CsvTestsDataLoader"
 }
 
+application {
+  mainClass = 'org.elasticsearch.xpack.esql.CsvTestsDataLoader'
+}

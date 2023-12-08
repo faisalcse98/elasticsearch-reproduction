@@ -20,7 +20,7 @@ import java.util.function.Function;
 
 public abstract class RuleExecutor<TreeType extends Node<TreeType>> {
 
-    private final Logger log = LogManager.getLogger(getClass());
+    // private final Logger log = LogManager.getLogger(getClass());
 
     public static class Limiter {
         public static final Limiter DEFAULT = new Limiter(100);
@@ -157,22 +157,28 @@ public abstract class RuleExecutor<TreeType extends Node<TreeType>> {
                 batchRuns++;
 
                 for (Rule<?, TreeType> rule : batch.rules) {
+                    /*
                     if (log.isTraceEnabled()) {
                         log.trace("About to apply rule {}", rule);
                     }
+                     */
                     Transformation tf = new Transformation(rule.name(), currentPlan, transform(rule));
                     tfs.add(tf);
                     currentPlan = tf.after;
 
                     if (tf.hasChanged()) {
                         hasChanged = true;
+                        /*
                         if (log.isTraceEnabled()) {
                             log.trace("Rule {} applied\n{}", rule, NodeUtils.diffString(tf.before, tf.after));
                         }
+                         */
                     } else {
+                        /*
                         if (log.isTraceEnabled()) {
                             log.trace("Rule {} applied w/o changes", rule);
                         }
+                         */
                     }
                 }
                 batchDuration = System.currentTimeMillis() - batchStart;
@@ -180,6 +186,7 @@ public abstract class RuleExecutor<TreeType extends Node<TreeType>> {
 
             totalDuration += batchDuration;
 
+            /*
             if (log.isTraceEnabled()) {
                 TreeType before = plan;
                 TreeType after = plan;
@@ -194,11 +201,14 @@ public abstract class RuleExecutor<TreeType extends Node<TreeType>> {
                     NodeUtils.diffString(before, after)
                 );
             }
+             */
         }
 
+        /*
         if (false == currentPlan.equals(plan) && log.isDebugEnabled()) {
             log.debug("Tree transformation took {}\n{}", TimeValue.timeValueMillis(totalDuration), NodeUtils.diffString(plan, currentPlan));
         }
+         */
 
         return new ExecutionInfo(plan, currentPlan, transformations);
     }

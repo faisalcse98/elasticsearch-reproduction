@@ -339,9 +339,11 @@ public class Analyzer extends ParameterizedRuleExecutor<LogicalPlan, AnalyzerCon
             // if resolved, return it; otherwise keep it in place to be resolved later
             if (named.size() == 1) {
                 resolved = named.get(0);
+                /*
                 if (log.isTraceEnabled() && resolved.resolved()) {
                     log.trace("Resolved {} to {}", ua, resolved);
                 }
+                 */
             } else {
                 if (named.size() > 0) {
                     resolved = ua.withUnresolvedMessage("Resolved [" + ua + "] unexpectedly to multiple attributes " + named);

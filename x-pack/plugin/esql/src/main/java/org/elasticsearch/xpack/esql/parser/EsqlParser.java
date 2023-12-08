@@ -32,16 +32,18 @@ import static org.elasticsearch.xpack.ql.parser.ParserUtils.source;
 
 public class EsqlParser {
 
-    private static final Logger log = LogManager.getLogger(EsqlParser.class);
+    // private static final Logger log = LogManager.getLogger(EsqlParser.class);
 
     public LogicalPlan createStatement(String query) {
         return createStatement(query, List.of());
     }
 
     public LogicalPlan createStatement(String query, List<TypedParamValue> params) {
+        /*
         if (log.isDebugEnabled()) {
             log.debug("Parsing as statement: {}", query);
         }
+         */
         return invokeParser(query, params, EsqlBaseParser::singleStatement, AstBuilder::plan);
     }
 
@@ -72,9 +74,11 @@ public class EsqlParser {
 
             ParserRuleContext tree = parseFunction.apply(parser);
 
+            /*
             if (log.isTraceEnabled()) {
                 log.trace("Parse tree: {}", tree.toStringTree());
             }
+             */
 
             return result.apply(new AstBuilder(paramTokens), tree);
         } catch (StackOverflowError e) {

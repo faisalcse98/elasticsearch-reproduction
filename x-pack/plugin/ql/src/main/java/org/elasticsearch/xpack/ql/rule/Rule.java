@@ -21,7 +21,7 @@ import org.elasticsearch.xpack.ql.util.ReflectionUtils;
  */
 public abstract class Rule<E extends T, T extends Node<T>> {
 
-    protected Logger log = LogManager.getLogger(getClass());
+    // protected Logger log = LogManager.getLogger(getClass());
 
     private final String name;
     private final Class<E> typeToken = ReflectionUtils.detectSuperTypeForRuleLike(getClass());

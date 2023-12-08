@@ -78,9 +78,11 @@ public class Analyzer extends ParameterizedRuleExecutor<LogicalPlan, AnalyzerCon
             }
 
             // okay, there's a chance so let's get started
+            /*
             if (log.isTraceEnabled()) {
                 log.trace("Attempting to resolve {}", plan.nodeString());
             }
+             */
 
             return plan.transformExpressionsUp(UnresolvedAttribute.class, u -> {
                 Collection<Attribute> childrenOutput = new LinkedHashSet<>();
@@ -90,9 +92,11 @@ public class Analyzer extends ParameterizedRuleExecutor<LogicalPlan, AnalyzerCon
                 NamedExpression named = resolveAgainstList(u, childrenOutput);
                 // if resolved, return it; otherwise keep it in place to be resolved later
                 if (named != null) {
+                    /*
                     if (log.isTraceEnabled()) {
                         log.trace("Resolved {} to {}", u, named);
                     }
+                     */
                     return named;
                 }
                 return u;
@@ -133,9 +137,11 @@ public class Analyzer extends ParameterizedRuleExecutor<LogicalPlan, AnalyzerCon
                 Expression resolved = resolveAgainstList(u, resolvedChildrenOutput);
                 // if resolved, return it; otherwise replace it with the missing attribute
                 if (resolved != null) {
+                    /*
                     if (log.isTraceEnabled()) {
                         log.trace("Resolved {} to {}", u, resolved);
                     }
+                     */
                 } else {
                     // when used in a filter, replace the field with a literal
                     if (plan instanceof Filter) {

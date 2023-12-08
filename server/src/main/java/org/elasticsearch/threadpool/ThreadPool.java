@@ -55,7 +55,7 @@ import static org.elasticsearch.core.Strings.format;
 
 public class ThreadPool implements ReportingService<ThreadPoolInfo>, Scheduler {
 
-    private static final Logger logger = LogManager.getLogger(ThreadPool.class);
+    // private static final Logger logger = LogManager.getLogger(ThreadPool.class);
 
     public static class Names {
         public static final String SAME = "same";
@@ -298,7 +298,7 @@ public class ThreadPool implements ReportingService<ThreadPoolInfo>, Scheduler {
             if (executors.containsKey(executorHolder.info.getName())) {
                 throw new IllegalStateException("duplicate executors with name [" + executorHolder.info.getName() + "] registered");
             }
-            logger.debug("created thread pool: {}", entry.getValue().formatInfo(executorHolder.info));
+            // logger.debug("created thread pool: {}", entry.getValue().formatInfo(executorHolder.info));
             executors.put(entry.getKey(), executorHolder);
         }
 
@@ -481,6 +481,7 @@ public class ThreadPool implements ReportingService<ThreadPoolInfo>, Scheduler {
                         contextPreservingRunnable.run();
                     } finally {
                         final long took = ThreadPool.this.relativeTimeInNanos() - startTime;
+                        /*
                         if (took > slowSchedulerWarnThresholdNanos) {
                             logger.warn(
                                 "execution of [{}] took [{}ms] which is above the warn threshold of [{}ms]",
@@ -489,6 +490,7 @@ public class ThreadPool implements ReportingService<ThreadPoolInfo>, Scheduler {
                                 TimeUnit.NANOSECONDS.toMillis(slowSchedulerWarnThresholdNanos)
                             );
                         }
+                         */
                     }
                 }
 
@@ -508,6 +510,7 @@ public class ThreadPool implements ReportingService<ThreadPoolInfo>, Scheduler {
             schedule(command, delay, executor);
         } catch (EsRejectedExecutionException e) {
             if (e.isExecutorShutdown()) {
+                /*
                 logger.debug(
                     () -> format(
                         "could not schedule execution of [%s] after [%s] on [%s] as executor is shut down",
@@ -517,6 +520,7 @@ public class ThreadPool implements ReportingService<ThreadPoolInfo>, Scheduler {
                     ),
                     e
                 );
+                 */
             } else {
                 throw e;
             }
@@ -525,10 +529,12 @@ public class ThreadPool implements ReportingService<ThreadPoolInfo>, Scheduler {
 
     public Cancellable scheduleWithFixedDelay(Runnable command, TimeValue interval, Executor executor) {
         var runnable = new ReschedulingRunnable(command, interval, executor, this, (e) -> {
+            /*
             if (logger.isDebugEnabled()) {
                 logger.debug(() -> format("scheduled task [%s] was rejected on thread pool [%s]", command, executor), e);
             }
-        }, (e) -> logger.warn(() -> format("failed to run scheduled task [%s] on thread pool [%s]", command, executor), e));
+             */
+        }, (e) -> System.out.println(e.toString()) /* logger.warn(() -> format("failed to run scheduled task [%s] on thread pool [%s]", command, executor), e) */ );
         runnable.start();
         return runnable;
     }
@@ -643,10 +649,12 @@ public class ThreadPool implements ReportingService<ThreadPoolInfo>, Scheduler {
                 executor.execute(runnable);
             } catch (EsRejectedExecutionException e) {
                 if (e.isExecutorShutdown()) {
+                    /*
                     logger.debug(
                         () -> format("could not schedule execution of [%s] on [%s] as executor is shut down", runnable, executor),
                         e
                     );
+                     */
                 } else {
                     throw e;
                 }
@@ -763,29 +771,33 @@ public class ThreadPool implements ReportingService<ThreadPoolInfo>, Scheduler {
                 final long deltaMillis = newAbsoluteMillis - absoluteMillis;
                 if (deltaMillis > thresholdMillis) {
                     final TimeValue delta = TimeValue.timeValueMillis(deltaMillis);
+                    /*
                     logger.warn(
                         "timer thread slept for [{}/{}ms] on absolute clock which is above the warn threshold of [{}ms]",
                         delta,
                         deltaMillis,
                         thresholdMillis
                     );
+                     */
                 } else if (deltaMillis < 0) {
                     final TimeValue delta = TimeValue.timeValueMillis(-deltaMillis);
-                    logger.warn("absolute clock went backwards by [{}/{}ms] while timer thread was sleeping", delta, -deltaMillis);
+                    // logger.warn("absolute clock went backwards by [{}/{}ms] while timer thread was sleeping", delta, -deltaMillis);
                 }
 
                 final long deltaNanos = newRelativeNanos - relativeNanos;
                 if (deltaNanos > thresholdNanos) {
                     final TimeValue delta = TimeValue.timeValueNanos(deltaNanos);
+                    /*
                     logger.warn(
                         "timer thread slept for [{}/{}ns] on relative clock which is above the warn threshold of [{}ms]",
                         delta,
                         deltaNanos,
                         thresholdMillis
                     );
+                     */
                 } else if (deltaNanos < 0) {
                     final TimeValue delta = TimeValue.timeValueNanos(-deltaNanos);
-                    logger.error("relative clock went backwards by [{}/{}ns] while timer thread was sleeping", delta, -deltaNanos);
+                    // logger.error("relative clock went backwards by [{}/{}ns] while timer thread was sleeping", delta, -deltaNanos);
                     assert false : "System::nanoTime time should be monotonic";
                 }
             } finally {

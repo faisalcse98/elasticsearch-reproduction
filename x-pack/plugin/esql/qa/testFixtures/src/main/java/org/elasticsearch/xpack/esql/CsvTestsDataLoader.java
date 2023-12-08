@@ -7,19 +7,11 @@
 package org.elasticsearch.xpack.esql;
 
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.logging.log4j.core.config.plugins.util.PluginManager;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.cluster.ClusterModule;
 import org.elasticsearch.common.CheckedBiFunction;
-import org.elasticsearch.common.logging.LogConfigurator;
 import org.elasticsearch.common.xcontent.LoggingDeprecationHandler;
 import org.elasticsearch.common.xcontent.XContentHelper;
 import org.elasticsearch.logging.LogManager;
@@ -30,14 +22,26 @@ import org.elasticsearch.xcontent.XContent;
 import org.elasticsearch.xcontent.XContentParser;
 import org.elasticsearch.xcontent.XContentParserConfiguration;
 import org.elasticsearch.xcontent.XContentType;
+import org.elasticsearch.xpack.esql.analysis.Analyzer;
+import org.elasticsearch.xpack.esql.analysis.AnalyzerContext;
+import org.elasticsearch.xpack.esql.analysis.EnrichResolution;
+import org.elasticsearch.xpack.esql.analysis.Verifier;
+import org.elasticsearch.xpack.esql.expression.function.EsqlFunctionRegistry;
+import org.elasticsearch.xpack.esql.parser.EsqlParser;
+import org.elasticsearch.xpack.esql.session.EsqlConfiguration;
+import org.elasticsearch.xpack.esql.stats.Metrics;
 import org.elasticsearch.xpack.ql.TestUtils;
+import org.elasticsearch.xpack.ql.expression.function.FunctionRegistry;
+import org.elasticsearch.xpack.ql.index.EsIndex;
+import org.elasticsearch.xpack.ql.index.IndexResolution;
+import org.elasticsearch.xpack.ql.plan.logical.LogicalPlan;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -87,6 +91,34 @@ public class CsvTestsDataLoader {
      * @throws IOException
      */
     public static void main(String[] args) throws IOException {
+        System.out.println("Program started");
+
+        EsIndex esIndex = new EsIndex("dummy string", Collections.emptyMap());
+        System.out.println("EsIndex is created");
+        EsqlConfiguration esqlConfiguration = EsqlTestUtils.TEST_CFG;
+        System.out.println("EsqlConfiguration is created");
+        FunctionRegistry functionRegistry = new EsqlFunctionRegistry();
+        System.out.println("FunctionRegistry is created");
+        IndexResolution indexResolution = IndexResolution.valid(esIndex);
+        System.out.println("IndexResolution is created");
+        EnrichResolution enrichResolution = EsqlTestUtils.emptyPolicyResolution();
+        System.out.println("IndexResolution is created");
+        AnalyzerContext analyzerContext = new AnalyzerContext(esqlConfiguration, functionRegistry, indexResolution, enrichResolution);
+        System.out.println("AnalyzerContext is created");
+        Metrics metrics = new Metrics();
+        System.out.println("Metrics is created");
+        Verifier verifier = new Verifier(metrics);
+        System.out.println("Verifier is created");
+        Analyzer analyzer = new Analyzer(analyzerContext, verifier);
+        System.out.println("Analyzer is created");
+        LogicalPlan plan = new EsqlParser().createStatement("row a = 1 | enrich my_policy");
+        System.out.println("LogicalPlan is created");
+        analyzer.analyze(plan);
+        System.out.println("Analyzer.analyze() is invoked");
+
+        System.out.println("Program finished");
+
+        /*
         // Need to setup the log configuration properly to avoid messages when creating a new RestClient
         PluginManager.addPackage(LogConfigurator.class.getPackage().getName());
         LogConfigurator.configureESLogging();
@@ -126,6 +158,7 @@ public class CsvTestsDataLoader {
         try (RestClient client = builder.build()) {
             loadDataSetIntoEs(client);
         }
+         */
     }
 
     public static void loadDataSetIntoEs(RestClient client) throws IOException {

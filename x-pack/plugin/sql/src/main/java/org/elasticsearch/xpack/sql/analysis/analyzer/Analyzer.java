@@ -322,9 +322,11 @@ public class Analyzer extends ParameterizedRuleExecutor<LogicalPlan, AnalyzerCon
                 }
             }
 
+            /*
             if (log.isTraceEnabled()) {
                 log.trace("Attempting to resolve {}", plan.nodeString());
             }
+             */
 
             return plan.transformExpressionsUp(UnresolvedAttribute.class, u -> {
                 List<Attribute> childrenOutput = new ArrayList<>();
@@ -334,9 +336,11 @@ public class Analyzer extends ParameterizedRuleExecutor<LogicalPlan, AnalyzerCon
                 NamedExpression named = resolveAgainstList(u, childrenOutput);
                 // if resolved, return it; otherwise keep it in place to be resolved later
                 if (named != null) {
+                    /*
                     if (log.isTraceEnabled()) {
                         log.trace("Resolved {} to {}", u, named);
                     }
+                     */
                     return named;
                 }
                 // TODO: likely have to expand * inside functions as well
@@ -420,11 +424,13 @@ public class Analyzer extends ParameterizedRuleExecutor<LogicalPlan, AnalyzerCon
         private LogicalPlan dedupRight(LogicalPlan left, LogicalPlan right) {
             AttributeSet conflicting = left.outputSet().intersect(right.outputSet());
 
+            /*
             if (log.isTraceEnabled()) {
                 log.trace(
                     "Trying to resolve conflicts " + conflicting + " between left " + left.nodeString() + " and right " + right.nodeString()
                 );
             }
+             */
 
             throw new UnsupportedOperationException("don't know how to resolve conficting IDs yet");
         }
